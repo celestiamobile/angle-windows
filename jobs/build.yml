@@ -18,6 +18,11 @@ jobs:
       modifyEnvironment: true
     displayName: 'Initialize Visual Studio Environment'
 
+  - script: |
+      choco install sentry-cli
+    displayName: 'Install Sentry CLI'
+    condition: ne( variables['VERSION'], '' )
+
   - task: NuGetCommand@2
     inputs:
       command: custom
@@ -56,3 +61,10 @@ jobs:
       PathtoPublish: '$(System.DefaultWorkingDirectory)\angle-$(arch)'
       ArtifactName: 'angle-$(arch)'
       publishLocation: Container
+
+  - script: |
+      sentry-cli debug-files upload -o celestia-vs -p windows --auth-token $(SENTRY_AUTH_TOKEN) --include-sources bin\libGLESv2.pdb
+      sentry-cli debug-files upload -o celestia-vs -p windows --auth-token $(SENTRY_AUTH_TOKEN) --include-sources bin\libEGL.pdb
+    workingDirectory: '$(System.DefaultWorkingDirectory)\angle-$(arch)'
+    displayName: 'Upload Symbols'
+    condition: ne( variables['VERSION'], '' )

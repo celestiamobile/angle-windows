@@ -7,12 +7,12 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>
-        $(MSBuildThisFileDirectory)..\$(_ANGLEArch)\include;%(AdditionalIncludeDirectories)
+        $(MSBuildThisFileDirectory)$(_ANGLEArch)\include;%(AdditionalIncludeDirectories)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>
-        $(MSBuildThisFileDirectory)..\$(_ANGLEArch)\lib;%(AdditionalLibraryDirectories)
+        $(MSBuildThisFileDirectory)$(_ANGLEArch)\lib;%(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
         libGLESv2.lib;libEGL.lib;%(AdditionalDependencies)
@@ -21,10 +21,10 @@
   </ItemDefinitionGroup>
 
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\$(_ANGLEArch)\bin\libEGL.dll">
+    <Content Include="$(MSBuildThisFileDirectory)$(_ANGLEArch)\bin\libEGL.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)..\$(_ANGLEArch)\bin\libGLESv2.dll">
+    <Content Include="$(MSBuildThisFileDirectory)$(_ANGLEArch)\bin\libGLESv2.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
