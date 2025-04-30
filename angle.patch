@@ -1,0 +1,56 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index 3e4c1710ba..b8cd947da9 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -349,10 +349,7 @@ config("extra_warnings") {
+       "-Wconditional-uninitialized",
+       "-Wextra-semi-stmt",
+       "-Wfloat-conversion",
+-      "-Winconsistent-missing-destructor-override",
+-      "-Wmissing-field-initializers",
+       "-Wnewline-eof",
+-      "-Wnon-virtual-dtor",
+       "-Wredundant-parens",
+       "-Wreturn-std-move",
+       "-Wshadow",
+@@ -361,7 +358,6 @@ config("extra_warnings") {
+       "-Wundefined-reinterpret-cast",
+       "-Wunneeded-internal-declaration",
+       "-Wunused-but-set-variable",
+-      "-Wsuggest-destructor-override",
+       "-Wsuggest-override",
+ 
+       # The below warnings are used by WebKit. We enable them to make rolling
+@@ -371,6 +367,12 @@ config("extra_warnings") {
+       "-Wstrict-prototypes",
+       "-Wunreachable-code-aggressive",
+       "-Wshorten-64-to-32",
++
++      "-Wno-header-hygiene",
++      "-Wno-ignored-attributes",
++      "-Wno-reorder-ctor",
++      "-Wno-unused-private-field",
++      "-Wno-unused-variable",
+     ]
+   }
+ 
+diff --git a/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp b/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
+index 8b724762d5..ac3340e81c 100644
+--- a/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
++++ b/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
+@@ -9,6 +9,7 @@
+ 
+ #include "libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.h"
+ #include "libANGLE/renderer/d3d/d3d11/winrt/SwapChainPanelNativeWindow.h"
++#include <cmath>
+ 
+ namespace rx
+ {
+@@ -291,6 +292,6 @@ RECT InspectableNativeWindow::clientRect(const Size &size)
+ {
+     // We don't have to check if a swapchain scale was specified here; the default value is 1.0f
+     // which will have no effect.
+-    return {0, 0, lround(size.Width * mSwapChainScale), lround(size.Height * mSwapChainScale)};
++    return {0, 0, std::lround(size.Width * mSwapChainScale), std::lround(size.Height * mSwapChainScale)};
+ }
+ }  // namespace rx

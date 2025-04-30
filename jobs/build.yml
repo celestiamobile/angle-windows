@@ -1,0 +1,58 @@
+jobs:
+- job: Build
+  displayName: 'Build'
+  timeoutInMinutes: 120
+  pool:
+    vmImage: windows-2025
+
+  variables:
+    winAppSdkVersion: '1.7.250401001'
+    webview2Version: '1.0.3179.45'
+    arch: ${{ parameters.arch }}
+
+  steps:
+  - task: BatchScript@1
+    inputs:
+      filename: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat'
+      arguments: '-arch=amd64'
+      modifyEnvironment: true
+    displayName: 'Initialize Visual Studio Environment'
+
+  - task: NuGetCommand@2
+    inputs:
+      command: custom
+      arguments: 'install Microsoft.WindowsAppSDK -Version $(winAppSdkVersion) -OutputDirectory $(System.DefaultWorkingDirectory)\WindowsAppSDK'
+    displayName: 'Download WindowsAppSDK'
+
+  - task: NuGetCommand@2
+    inputs:
+      command: custom
+      arguments: 'install Microsoft.Web.WebView2 -Version $(webview2Version) -OutputDirectory $(System.DefaultWorkingDirectory)\WindowsAppSDK'
+    displayName: 'Download WebView2'
+
+  - script: |
+      winmdidl /nologo /outdir:. ../lib/uap10.0.18362/Microsoft.Foundation.winmd
+      winmdidl /nologo /outdir:. ../lib/uap10.0.18362/Microsoft.Graphics.winmd
+      winmdidl /nologo /outdir:. ../lib/uap10.0.18362/Microsoft.UI.winmd
+      winmdidl /nologo /outdir:. ../lib/uap10.0/Microsoft.UI.Text.winmd
+      winmdidl /nologo /outdir:. ../../Microsoft.Web.WebView2.$(webview2Version)/lib/Microsoft.Web.WebView2.Core.winmd
+      winmdidl /nologo /outdir:. ../lib/uap10.0/Microsoft.Windows.ApplicationModel.Resources.winmd
+      winmdidl /nologo /outdir:. ../lib/uap10.0/Microsoft.UI.Xaml.winmd
+      for %%i in (*.idl) do (
+        midlrt %%i /metadata_dir C:\Windows\System32\WinMetadata /ns_prefix /nomidl
+      )
+    workingDirectory: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.$(winAppSdkVersion)\include'
+    displayName: 'Make Header Files'
+
+  - script: |
+      call build.cmd $(arch)
+    env:
+      WINDOWSAPP_SDK_DIR: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.$(winAppSdkVersion)'
+    displayName: 'Build'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact'
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)\angle-$(arch)'
+      ArtifactName: 'angle-$(arch)'
+      publishLocation: Container

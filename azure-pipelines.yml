@@ -1,0 +1,16 @@
+stages:
+- stage: x64
+  displayName: 'Build x64'
+  dependsOn: []
+  jobs:
+  - template: jobs/build.yml
+    parameters:
+      arch: x64
+
+- stage: arm64
+  displayName: 'Build arm64'
+  dependsOn: []
+  jobs:
+  - template: jobs/build.yml
+    parameters:
+      arch: arm64

@@ -1,0 +1,28 @@
+diff --git a/toolchain/win/BUILD.gn b/toolchain/win/BUILD.gn
+index d7f348487..aa955fefe 100644
+--- a/toolchain/win/BUILD.gn
++++ b/toolchain/win/BUILD.gn
+@@ -13,23 +13,6 @@ assert(is_win, "Should only be running on Windows")
+ # "environment.x86" and "environment.x64" to the build directory and return a
+ # list to us.
+ 
+-# Copy the VS runtime DLL for the default toolchain to the root build directory
+-# so things will run.
+-if (current_toolchain == default_toolchain) {
+-  if (is_debug) {
+-    configuration_name = "Debug"
+-  } else {
+-    configuration_name = "Release"
+-  }
+-  exec_script("../../vs_toolchain.py",
+-              [
+-                "copy_dlls",
+-                rebase_path(root_build_dir),
+-                configuration_name,
+-                target_cpu,
+-              ])
+-}
+-
+ if (target_cpu == "x86" || target_cpu == "x64") {
+   win_toolchains("x86") {
+     toolchain_arch = "x86"
