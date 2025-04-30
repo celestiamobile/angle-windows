@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>ANGLE</id>
+    <version>1.0.0</version>
+    <authors>Google</authors>
+    <description>ANGLE OpenGL ES bindings for x64 and arm64</description>
+    <tags>angle opengl es native x64 arm64</tags>
+  </metadata>
+  <files>
+    <file src="angle-x64\include\**\*" target="build\native\x64\include" />
+    <file src="angle-x64\lib\**\*" target="build\native\x64\lib" />
+    <file src="angle-x64\bin\**\*" target="build\native\x64\bin" />
+    <file src="angle-arm64\include\**\*" target="build\native\arm64\include" />
+    <file src="angle-arm64\lib\**\*" target="build\native\arm64\lib" />
+    <file src="angle-arm64\bin\**\*" target="build\native\arm64\bin" />
+    <file src="ANGLE.targets" target="build\native\ANGLE.targets" />
+  </files>
+</package>

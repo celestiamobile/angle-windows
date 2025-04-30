@@ -1,0 +1,32 @@
+<Project>
+  <PropertyGroup>
+    <_ANGLEArch Condition="'$(Platform)' == 'x64'">x64</_ANGLEArch>
+    <_ANGLEArch Condition="'$(Platform)' == 'ARM64'">arm64</_ANGLEArch>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+        $(MSBuildThisFileDirectory)..\$(_ANGLEArch)\include;%(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>
+        $(MSBuildThisFileDirectory)..\$(_ANGLEArch)\lib;%(AdditionalLibraryDirectories)
+      </AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+        libGLESv2.lib;libEGL.lib;%(AdditionalDependencies)
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\$(_ANGLEArch)\bin\libEGL.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)..\$(_ANGLEArch)\bin\libGLESv2.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
+

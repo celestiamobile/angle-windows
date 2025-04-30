@@ -14,3 +14,12 @@ stages:
   - template: jobs/build.yml
     parameters:
       arch: arm64
+
+- stage: Package
+  displayName: 'Package'
+  dependsOn:
+  - x64
+  - arm64
+  jobs:
+  - template: jobs/package.yml
+  condition: ne( variables['VERSION'], '' )
