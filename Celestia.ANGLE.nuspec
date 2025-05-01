@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <metadata>
-    <id>ANGLE</id>
+    <id>Celestia.ANGLE</id>
     <version>1.0.0</version>
     <authors>Google</authors>
     <description>ANGLE OpenGL ES bindings for x64 and arm64</description>
@@ -14,6 +14,6 @@
     <file src="angle-arm64\include\**\*" target="build\native\arm64\include" />
     <file src="angle-arm64\lib\**\*" target="build\native\arm64\lib" />
     <file src="angle-arm64\bin\**\*" target="build\native\arm64\bin" />
-    <file src="ANGLE.targets" target="build\native\ANGLE.targets" />
+    <file src="Celestia.ANGLE.targets" target="build\native\Celestia.ANGLE.targets" />
   </files>
 </package>

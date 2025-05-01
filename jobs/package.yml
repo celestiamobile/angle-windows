@@ -20,20 +20,20 @@ jobs:
   - task: NuGetCommand@2
     inputs:
       command: custom
-      arguments: 'pack ANGLE.nuspec -Version $(VERSION)'
+      arguments: 'pack Celestia.ANGLE.nuspec -Version $(VERSION)'
     displayName: 'Package'
 
   - task: NuGetCommand@2
     displayName: 'Publish Package'
     inputs:
       command: 'push'
-      packagesToPush: '$(System.DefaultWorkingDirectory)\ANGLE.$(VERSION).nupkg'
+      packagesToPush: '$(System.DefaultWorkingDirectory)\Celestia.ANGLE.$(VERSION).nupkg'
       nuGetFeedType: 'internal'
       publishVstsFeed: '9f9dcde1-dcba-4537-8214-71c8a03b99a0/14bb1031-e6b2-40ac-b287-73e7fcb5900e'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact'
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)\ANGLE.$(VERSION).nupkg'
+      PathtoPublish: '$(System.DefaultWorkingDirectory)\Celestia.ANGLE.$(VERSION).nupkg'
       ArtifactName: 'angle'
       publishLocation: Container
