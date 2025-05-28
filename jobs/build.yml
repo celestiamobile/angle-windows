@@ -6,8 +6,8 @@ jobs:
     vmImage: windows-2025
 
   variables:
-    winAppSdkVersion: '1.7.250401001'
-    webview2Version: '1.0.3179.45'
+    winAppSdkVersion: '1.7.250513003'
+    webview2Version: '1.0.3240.44'
     arch: ${{ parameters.arch }}
 
   steps:
