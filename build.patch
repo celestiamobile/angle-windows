@@ -1,3 +1,16 @@
+diff --git a/compute_build_timestamp.py b/compute_build_timestamp.py
+index 838b3fae6..4ba6dbe72 100755
+--- a/compute_build_timestamp.py
++++ b/compute_build_timestamp.py
+@@ -117,7 +117,7 @@ def main():
+   # use the link timestamp as the prime differentiator, but for unofficial
+   # builds we do lots of quantization to avoid churn.
+   offset = 0
+-  if args.build_type == 'official':
++  if False:
+     if os.name == 'nt':
+       version_path = os.path.join(THIS_DIR, os.pardir, 'chrome', 'VERSION')
+       with open(version_path) as f:
 diff --git a/toolchain/win/BUILD.gn b/toolchain/win/BUILD.gn
 index d7f348487..aa955fefe 100644
 --- a/toolchain/win/BUILD.gn
