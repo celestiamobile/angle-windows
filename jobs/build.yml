@@ -6,8 +6,10 @@ jobs:
     vmImage: windows-2025
 
   variables:
-    winAppSdkVersion: '1.7.250606001'
-    webview2Version: '1.0.3296.44'
+    winUIVersion: '1.8.250906003'
+    foundationVersion: '1.8.250906002'
+    interactiveExperiencesVersion: '1.8.250906004'
+    webview2Version: '1.0.3485.44'
     arch: ${{ parameters.arch }}
 
   steps:
@@ -26,7 +28,7 @@ jobs:
   - task: NuGetCommand@2
     inputs:
       command: custom
-      arguments: 'install Microsoft.WindowsAppSDK -Version $(winAppSdkVersion) -OutputDirectory $(System.DefaultWorkingDirectory)\WindowsAppSDK'
+      arguments: 'install Microsoft.WindowsAppSDK.WinUI -Version $(winUIVersion) -OutputDirectory $(System.DefaultWorkingDirectory)\WindowsAppSDK'
     displayName: 'Download WindowsAppSDK'
 
   - task: NuGetCommand@2
@@ -36,23 +38,29 @@ jobs:
     displayName: 'Download WebView2'
 
   - script: |
-      winmdidl /nologo /outdir:. ../lib/uap10.0.18362/Microsoft.Foundation.winmd
-      winmdidl /nologo /outdir:. ../lib/uap10.0.18362/Microsoft.Graphics.winmd
-      winmdidl /nologo /outdir:. ../lib/uap10.0.18362/Microsoft.UI.winmd
-      winmdidl /nologo /outdir:. ../lib/uap10.0/Microsoft.UI.Text.winmd
+      winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.InteractiveExperiences.$(interactiveExperiencesVersion)/metadata/10.0.18362.0/Microsoft.Foundation.winmd
+      winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.InteractiveExperiences.$(interactiveExperiencesVersion)/metadata/10.0.18362.0/Microsoft.Graphics.winmd
+      winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.InteractiveExperiences.$(interactiveExperiencesVersion)/metadata/10.0.18362.0/Microsoft.UI.winmd
+      winmdidl /nologo /outdir:. ../metadata/Microsoft.UI.Text.winmd
       winmdidl /nologo /outdir:. ../../Microsoft.Web.WebView2.$(webview2Version)/lib/Microsoft.Web.WebView2.Core.winmd
-      winmdidl /nologo /outdir:. ../lib/uap10.0/Microsoft.Windows.ApplicationModel.Resources.winmd
-      winmdidl /nologo /outdir:. ../lib/uap10.0/Microsoft.UI.Xaml.winmd
+      winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.Foundation.$(foundationVersion)/metadata/Microsoft.Windows.ApplicationModel.Resources.winmd
+      winmdidl /nologo /outdir:. ../metadata/Microsoft.UI.Xaml.winmd
       for %%i in (*.idl) do (
         midlrt %%i /metadata_dir C:\Windows\System32\WinMetadata /ns_prefix /nomidl
       )
-    workingDirectory: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.$(winAppSdkVersion)\include'
+    workingDirectory: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.WinUI.$(winUIVersion)\include'
     displayName: 'Make Header Files'
+
+  - script: |
+      mkdir win10-$(arch)
+      move ..\..\Microsoft.WindowsAppSDK.Foundation.$(foundationVersion)\lib\native\$(arch)\* win10-$(arch)\
+    workingDirectory: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.WinUI.$(winUIVersion)\lib'
+    displayName: 'Move Libs'
 
   - script: |
       call build.cmd $(arch)
     env:
-      WINDOWSAPP_SDK_DIR: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.$(winAppSdkVersion)'
+      WINDOWSAPP_SDK_DIR: '$(System.DefaultWorkingDirectory)\WindowsAppSDK\Microsoft.WindowsAppSDK.WinUI.$(winUIVersion)'
     displayName: 'Build'
 
   - task: PublishBuildArtifacts@1
