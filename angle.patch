@@ -1,8 +1,8 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 3e4c1710ba..b8cd947da9 100644
+index 595e09a71c..0e00ce2cd1 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -349,10 +349,7 @@ config("extra_warnings") {
+@@ -356,10 +356,7 @@ config("extra_warnings") {
        "-Wconditional-uninitialized",
        "-Wextra-semi-stmt",
        "-Wfloat-conversion",
@@ -13,7 +13,7 @@ index 3e4c1710ba..b8cd947da9 100644
        "-Wredundant-parens",
        "-Wreturn-std-move",
        "-Wshadow",
-@@ -361,7 +358,6 @@ config("extra_warnings") {
+@@ -368,7 +365,6 @@ config("extra_warnings") {
        "-Wundefined-reinterpret-cast",
        "-Wunneeded-internal-declaration",
        "-Wunused-but-set-variable",
@@ -21,7 +21,7 @@ index 3e4c1710ba..b8cd947da9 100644
        "-Wsuggest-override",
  
        # The below warnings are used by WebKit. We enable them to make rolling
-@@ -371,6 +367,12 @@ config("extra_warnings") {
+@@ -378,6 +374,12 @@ config("extra_warnings") {
        "-Wstrict-prototypes",
        "-Wunreachable-code-aggressive",
        "-Wshorten-64-to-32",
@@ -33,6 +33,21 @@ index 3e4c1710ba..b8cd947da9 100644
 +      "-Wno-unused-variable",
      ]
    }
+ 
+diff --git a/src/common/system_utils_winuwp.cpp b/src/common/system_utils_winuwp.cpp
+index a0ed2c821b..a715a6c97e 100644
+--- a/src/common/system_utils_winuwp.cpp
++++ b/src/common/system_utils_winuwp.cpp
+@@ -6,6 +6,10 @@
+ 
+ // system_utils_winuwp.cpp: Implementation of OS-specific functions for Windows UWP
+ 
++#ifdef UNSAFE_BUFFERS_BUILD
++#    pragma allow_unsafe_buffers
++#endif
++
+ #include "common/debug.h"
+ #include "system_utils.h"
  
 diff --git a/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp b/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
 index 8b724762d5..ac3340e81c 100644
