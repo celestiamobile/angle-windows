@@ -1,0 +1,150 @@
+name: ANGLE Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Optional base version (e.g. 1.8.0). If omitted, a dev package is produced and no release is created.'
+        required: false
+        type: string
+
+env:
+  WINUI_VERSION: 1.8.251105000
+  FOUNDATION_VERSION: 1.8.251104000
+  INTERACTIVE_EXPERIENCES_VERSION: 1.8.251104001
+  WEBVIEW2_VERSION: 1.0.3595.46
+
+jobs:
+  build:
+    name: Build (${{ matrix.arch }})
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup MSVC Toolchain
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          # Host architecture sufficient for both target x64 & arm64 via GN args
+          architecture: x64
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+
+      - name: Download WindowsAppSDK & WebView2 Packages
+        run: |
+          nuget install Microsoft.WindowsAppSDK.WinUI -Version %WINUI_VERSION% -OutputDirectory WindowsAppSDK
+          nuget install Microsoft.Web.WebView2 -Version %WEBVIEW2_VERSION% -OutputDirectory WindowsAppSDK
+          nuget install Microsoft.WindowsAppSDK.Foundation -Version %FOUNDATION_VERSION% -OutputDirectory WindowsAppSDK
+          nuget install Microsoft.WindowsAppSDK.InteractiveExperiences -Version %INTERACTIVE_EXPERIENCES_VERSION% -OutputDirectory WindowsAppSDK
+        shell: cmd
+
+      - name: Generate Header Files
+        working-directory: WindowsAppSDK/Microsoft.WindowsAppSDK.WinUI.${{ env.WINUI_VERSION }}/include
+        shell: cmd
+        run: |
+          winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.InteractiveExperiences.%INTERACTIVE_EXPERIENCES_VERSION%/metadata/10.0.18362.0/Microsoft.Foundation.winmd
+          winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.InteractiveExperiences.%INTERACTIVE_EXPERIENCES_VERSION%/metadata/10.0.18362.0/Microsoft.Graphics.winmd
+          winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.InteractiveExperiences.%INTERACTIVE_EXPERIENCES_VERSION%/metadata/10.0.18362.0/Microsoft.UI.winmd
+          winmdidl /nologo /outdir:. ../metadata/Microsoft.UI.Text.winmd
+          winmdidl /nologo /outdir:. ../../Microsoft.Web.WebView2.%WEBVIEW2_VERSION%/lib/Microsoft.Web.WebView2.Core.winmd
+          winmdidl /nologo /outdir:. ../../Microsoft.WindowsAppSDK.Foundation.%FOUNDATION_VERSION%/metadata/Microsoft.Windows.ApplicationModel.Resources.winmd
+          winmdidl /nologo /outdir:. ../metadata/Microsoft.UI.Xaml.winmd
+          rem Iterate over all generated .idl files and compile them with midlrt
+          for %%i in (*.idl) do (
+            midlrt %%i /metadata_dir C:\Windows\System32\WinMetadata /ns_prefix /nomidl
+          )
+
+      - name: Move Libs
+        working-directory: WindowsAppSDK/Microsoft.WindowsAppSDK.WinUI.${{ env.WINUI_VERSION }}/lib
+        shell: cmd
+        run: |
+          mkdir win10-${{ matrix.arch }}
+          move ..\..\Microsoft.WindowsAppSDK.Foundation.%FOUNDATION_VERSION%\lib\native\${{ matrix.arch }}\* win10-${{ matrix.arch }}\
+
+      - name: Build ANGLE
+        shell: cmd
+        env:
+          WINDOWSAPP_SDK_DIR: ${{ github.workspace }}\WindowsAppSDK\Microsoft.WindowsAppSDK.WinUI.${{ env.WINUI_VERSION }}
+        run: |
+          call build.cmd ${{ matrix.arch }}
+
+      - name: Upload Symbols (manual trigger only)
+        if: github.event_name == 'workflow_dispatch' && env.SENTRY_AUTH_TOKEN != ''
+        shell: cmd
+        working-directory: angle-${{ matrix.arch }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          choco install sentry-cli -y
+          sentry-cli debug-files upload -o celestia-vs -p windows --auth-token %SENTRY_AUTH_TOKEN% --include-sources bin\libGLESv2.pdb
+          sentry-cli debug-files upload -o celestia-vs -p windows --auth-token %SENTRY_AUTH_TOKEN% --include-sources bin\libEGL.pdb
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: angle-${{ matrix.arch }}
+          path: angle-${{ matrix.arch }}
+          retention-days: 30
+
+  package-and-release:
+    name: Package & (Conditional) Release
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download x64 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: angle-x64
+          path: angle-x64
+
+      - name: Download arm64 Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: angle-arm64
+          path: angle-arm64
+
+      - name: Compute Version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}.${{ github.run_number }}" >> $GITHUB_ENV
+            echo "Release will be created for version ${{ github.event.inputs.version }}.${{ github.run_number }}"
+          else
+            echo "VERSION=0.0.0-run${{ github.run_number }}" >> $GITHUB_ENV
+            echo "No base version provided; using dev version 0.0.0-run${{ github.run_number }} (no release)."
+          fi
+
+      - name: Package NuGet
+        shell: cmd
+        run: |
+          choco install nuget.commandline -y
+          nuget pack Celestia.ANGLE.nuspec -Version %VERSION%
+
+      - name: Upload NuGet Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Celestia.ANGLE.${{ env.VERSION }}.nupkg
+          path: Celestia.ANGLE.${{ env.VERSION }}.nupkg
+          retention-days: 30
+
+      - name: Create Release
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Celestia ANGLE ${{ env.VERSION }}
+          tag_name: angle-${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            Celestia.ANGLE.${{ env.VERSION }}.nupkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

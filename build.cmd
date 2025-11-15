@@ -67,7 +67,7 @@ call git checkout --force FETCH_HEAD || exit /b 1
 
 python.exe scripts\bootstrap.py || exit /b 1
 
-"C:\Program Files\Git\usr\bin\sed.exe" -i.bak -e "/'third_party\/catapult'\: /,+3d" -e "/'third_party\/dawn'\: /,+3d" -e "/'third_party\/llvm\/src'\: /,+3d" -e "/'third_party\/SwiftShader'\: /,+3d" -e "/'third_party\/VK-GL-CTS\/src'\: /,+3d" -e "s/'tools\/rust\/update_rust.py'/'-c',''/" DEPS || exit /b 1
+"C:\Program Files\Git\usr\bin\sed.exe" -i.bak -e "/'third_party\/catapult'\: /,+3d" -e "/'third_party\/dawn'\: /,+3d" -e "/'third_party\/llvm\/src'\: /,+3d" -e "/'third_party\/SwiftShader'\: /,+3d" -e "/'third_party\/VK-GL-CTS\/src'\: /,+3d" DEPS || exit /b 1
 call gclient sync -f -D -R || exit /b 1
 
 popd
