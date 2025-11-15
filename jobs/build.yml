@@ -6,10 +6,10 @@ jobs:
     vmImage: windows-2025
 
   variables:
-    winUIVersion: '1.8.250906003'
-    foundationVersion: '1.8.250906002'
-    interactiveExperiencesVersion: '1.8.250906004'
-    webview2Version: '1.0.3485.44'
+    winUIVersion: '1.8.251105000'
+    foundationVersion: '1.8.251104000'
+    interactiveExperiencesVersion: '1.8.251104001'
+    webview2Version: '1.0.3595.46'
     arch: ${{ parameters.arch }}
 
   steps:
