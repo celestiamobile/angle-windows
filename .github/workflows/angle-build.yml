@@ -81,8 +81,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           choco install sentry-cli -y
-          sentry-cli debug-files upload -o celestia-vs -p windows --auth-token %SENTRY_AUTH_TOKEN% --include-sources bin\libGLESv2.pdb
-          sentry-cli debug-files upload -o celestia-vs -p windows --auth-token %SENTRY_AUTH_TOKEN% --include-sources bin\libEGL.pdb
+          sentry-cli debug-files upload -o celestia-vs -p windows --auth-token %SENTRY_AUTH_TOKEN% --include-sources bin\libGLESv2.pdb bin\libGLESv2.dll bin\libEGL.pdb bin\libEGL.dll
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
