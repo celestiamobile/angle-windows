@@ -51,6 +51,27 @@ index ce5ab0ba89..3c7e3fbea5 100644
  }
  
  libangle_image_util_headers = [
+diff --git a/src/common/system_utils_win.cpp b/src/common/system_utils_win.cpp
+index 6a653ac339..06bcedbebb 100644
+--- a/src/common/system_utils_win.cpp
++++ b/src/common/system_utils_win.cpp
+@@ -152,8 +152,6 @@ char GetPathSeparator()
+ 
+ std::string GetModuleDirectory()
+ {
+-// GetModuleHandleEx is unavailable on UWP
+-#if !defined(ANGLE_IS_WINUWP)
+     static int placeholderSymbol = 0;
+     HMODULE module               = nullptr;
+     if (GetModuleHandleExW(
+@@ -162,7 +160,6 @@ std::string GetModuleDirectory()
+     {
+         return GetDirectory(module);
+     }
+-#endif
+     return GetDirectory(nullptr);
+ }
+ 
 diff --git a/src/common/system_utils_winuwp.cpp b/src/common/system_utils_winuwp.cpp
 index a0ed2c821b..a715a6c97e 100644
 --- a/src/common/system_utils_winuwp.cpp
