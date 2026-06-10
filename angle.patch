@@ -52,25 +52,50 @@ index ce5ab0ba89..3c7e3fbea5 100644
  
  libangle_image_util_headers = [
 diff --git a/src/common/system_utils_win.cpp b/src/common/system_utils_win.cpp
-index 6a653ac339..06bcedbebb 100644
+index 6a653ac339..a433189712 100644
 --- a/src/common/system_utils_win.cpp
 +++ b/src/common/system_utils_win.cpp
-@@ -152,8 +152,6 @@ char GetPathSeparator()
+@@ -6,6 +6,10 @@
  
- std::string GetModuleDirectory()
- {
--// GetModuleHandleEx is unavailable on UWP
--#if !defined(ANGLE_IS_WINUWP)
-     static int placeholderSymbol = 0;
-     HMODULE module               = nullptr;
-     if (GetModuleHandleExW(
-@@ -162,7 +160,6 @@ std::string GetModuleDirectory()
-     {
-         return GetDirectory(module);
-     }
--#endif
-     return GetDirectory(nullptr);
- }
+ // system_utils_win.cpp: Implementation of OS-specific functions for Windows
+ 
++#if defined(ANGLE_IS_WINUWP)
++#    undef ANGLE_IS_WINUWP
++#endif
++
+ #include "system_utils.h"
+ 
+ #include <fileapi.h>
+diff --git a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp b/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
+index 471d942c60..f7ae59f49b 100644
+--- a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
++++ b/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
+@@ -11,6 +11,10 @@
+ #    pragma allow_unsafe_buffers
+ #endif
+ 
++#if defined(ANGLE_ENABLE_WINDOWS_UWP)
++#    undef ANGLE_ENABLE_WINDOWS_UWP
++#endif
++
+ #include "libANGLE/renderer/d3d/d3d11/renderer11_utils.h"
+ 
+ #include <algorithm>
+diff --git a/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp b/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp
+index ac6d9a5220..62b0b1853d 100644
+--- a/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp
++++ b/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp
+@@ -6,6 +6,10 @@
+ 
+ // Trim11.cpp: Trim support utility class.
+ 
++#if defined(ANGLE_ENABLE_WINDOWS_UWP)
++#    undef ANGLE_ENABLE_WINDOWS_UWP
++#endif
++
+ #include "libANGLE/renderer/d3d/d3d11/Trim11.h"
+ #include "libANGLE/renderer/d3d/d3d11/Renderer11.h"
+ #include "libANGLE/renderer/d3d/d3d11/renderer11_utils.h"
  
 diff --git a/src/common/system_utils_winuwp.cpp b/src/common/system_utils_winuwp.cpp
 index a0ed2c821b..a715a6c97e 100644
