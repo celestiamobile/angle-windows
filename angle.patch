@@ -34,6 +34,23 @@ index 595e09a71c..0e00ce2cd1 100644
      ]
    }
  
+diff --git a/src/libGLESv2.gni b/src/libGLESv2.gni
+index ce5ab0ba89..3c7e3fbea5 100644
+--- a/src/libGLESv2.gni
++++ b/src/libGLESv2.gni
+@@ -146,11 +146,7 @@ if (is_apple) {
+ 
+ if (is_win) {
+   libangle_common_sources += [ "src/common/system_utils_win.cpp" ]
+-  if (angle_is_winuwp) {
+-    libangle_common_sources += [ "src/common/system_utils_winuwp.cpp" ]
+-  } else {
+-    libangle_common_sources += [ "src/common/system_utils_win32.cpp" ]
+-  }
++  libangle_common_sources += [ "src/common/system_utils_win32.cpp" ]
+ }
+ 
+ libangle_image_util_headers = [
 diff --git a/src/common/system_utils_winuwp.cpp b/src/common/system_utils_winuwp.cpp
 index a0ed2c821b..a715a6c97e 100644
 --- a/src/common/system_utils_winuwp.cpp
