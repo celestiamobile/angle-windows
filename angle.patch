@@ -1,8 +1,8 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index 595e09a71c..0e00ce2cd1 100644
+index 81d5cb41c1..49a12f5fd3 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -356,10 +356,7 @@ config("extra_warnings") {
+@@ -381,10 +381,7 @@ config("extra_warnings") {
        "-Wconditional-uninitialized",
        "-Wextra-semi-stmt",
        "-Wfloat-conversion",
@@ -13,7 +13,7 @@ index 595e09a71c..0e00ce2cd1 100644
        "-Wredundant-parens",
        "-Wreturn-std-move",
        "-Wshadow",
-@@ -368,7 +365,6 @@ config("extra_warnings") {
+@@ -393,7 +390,6 @@ config("extra_warnings") {
        "-Wundefined-reinterpret-cast",
        "-Wunneeded-internal-declaration",
        "-Wunused-but-set-variable",
@@ -21,7 +21,7 @@ index 595e09a71c..0e00ce2cd1 100644
        "-Wsuggest-override",
  
        # The below warnings are used by WebKit. We enable them to make rolling
-@@ -378,6 +374,12 @@ config("extra_warnings") {
+@@ -403,6 +399,12 @@ config("extra_warnings") {
        "-Wstrict-prototypes",
        "-Wunreachable-code-aggressive",
        "-Wshorten-64-to-32",
@@ -34,23 +34,6 @@ index 595e09a71c..0e00ce2cd1 100644
      ]
    }
  
-diff --git a/src/libGLESv2.gni b/src/libGLESv2.gni
-index ce5ab0ba89..3c7e3fbea5 100644
---- a/src/libGLESv2.gni
-+++ b/src/libGLESv2.gni
-@@ -146,11 +146,7 @@ if (is_apple) {
- 
- if (is_win) {
-   libangle_common_sources += [ "src/common/system_utils_win.cpp" ]
--  if (angle_is_winuwp) {
--    libangle_common_sources += [ "src/common/system_utils_winuwp.cpp" ]
--  } else {
--    libangle_common_sources += [ "src/common/system_utils_win32.cpp" ]
--  }
-+  libangle_common_sources += [ "src/common/system_utils_win32.cpp" ]
- }
- 
- libangle_image_util_headers = [
 diff --git a/src/common/system_utils_win.cpp b/src/common/system_utils_win.cpp
 index 6a653ac339..a433189712 100644
 --- a/src/common/system_utils_win.cpp
@@ -66,21 +49,21 @@ index 6a653ac339..a433189712 100644
  #include "system_utils.h"
  
  #include <fileapi.h>
-diff --git a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp b/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
-index 471d942c60..f7ae59f49b 100644
---- a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
-+++ b/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
-@@ -11,6 +11,10 @@
- #    pragma allow_unsafe_buffers
- #endif
+diff --git a/src/common/system_utils_winuwp.cpp b/src/common/system_utils_winuwp.cpp
+index a0ed2c821b..a715a6c97e 100644
+--- a/src/common/system_utils_winuwp.cpp
++++ b/src/common/system_utils_winuwp.cpp
+@@ -6,6 +6,10 @@
  
-+#if defined(ANGLE_ENABLE_WINDOWS_UWP)
-+#    undef ANGLE_ENABLE_WINDOWS_UWP
+ // system_utils_winuwp.cpp: Implementation of OS-specific functions for Windows UWP
+ 
++#ifdef UNSAFE_BUFFERS_BUILD
++#    pragma allow_unsafe_buffers
 +#endif
 +
- #include "libANGLE/renderer/d3d/d3d11/renderer11_utils.h"
+ #include "common/debug.h"
+ #include "system_utils.h"
  
- #include <algorithm>
 diff --git a/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp b/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp
 index ac6d9a5220..62b0b1853d 100644
 --- a/src/libANGLE/renderer/d3d/d3d11/Trim11.cpp
@@ -96,21 +79,20 @@ index ac6d9a5220..62b0b1853d 100644
  #include "libANGLE/renderer/d3d/d3d11/Trim11.h"
  #include "libANGLE/renderer/d3d/d3d11/Renderer11.h"
  #include "libANGLE/renderer/d3d/d3d11/renderer11_utils.h"
+diff --git a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp b/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
+index d250ea374d..2feea49592 100644
+--- a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
++++ b/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
+@@ -7,6 +7,10 @@
+ // renderer11_utils.cpp: Conversion functions and other utility routines
+ // specific to the D3D11 renderer.
  
-diff --git a/src/common/system_utils_winuwp.cpp b/src/common/system_utils_winuwp.cpp
-index a0ed2c821b..a715a6c97e 100644
---- a/src/common/system_utils_winuwp.cpp
-+++ b/src/common/system_utils_winuwp.cpp
-@@ -6,6 +6,10 @@
- 
- // system_utils_winuwp.cpp: Implementation of OS-specific functions for Windows UWP
- 
-+#ifdef UNSAFE_BUFFERS_BUILD
-+#    pragma allow_unsafe_buffers
++#if defined(ANGLE_ENABLE_WINDOWS_UWP)
++#    undef ANGLE_ENABLE_WINDOWS_UWP
 +#endif
 +
- #include "common/debug.h"
- #include "system_utils.h"
+ #include "libANGLE/renderer/d3d/d3d11/renderer11_utils.h"
+ #include "common/unsafe_buffers.h"
  
 diff --git a/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp b/src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.cpp
 index 8b724762d5..ac3340e81c 100644
@@ -132,3 +114,20 @@ index 8b724762d5..ac3340e81c 100644
 +    return {0, 0, std::lround(size.Width * mSwapChainScale), std::lround(size.Height * mSwapChainScale)};
  }
  }  // namespace rx
+diff --git a/src/libGLESv2.gni b/src/libGLESv2.gni
+index 458bc1b1f0..e1c7fd779f 100644
+--- a/src/libGLESv2.gni
++++ b/src/libGLESv2.gni
+@@ -146,11 +146,7 @@ if (is_apple) {
+ 
+ if (is_win) {
+   libangle_common_sources += [ "src/common/system_utils_win.cpp" ]
+-  if (angle_is_winuwp) {
+-    libangle_common_sources += [ "src/common/system_utils_winuwp.cpp" ]
+-  } else {
+-    libangle_common_sources += [ "src/common/system_utils_win32.cpp" ]
+-  }
++  libangle_common_sources += [ "src/common/system_utils_win32.cpp" ]
+ }
+ 
+ libangle_image_util_headers = [
