@@ -11,10 +11,10 @@ on:
         type: string
 
 env:
-  WINUI_VERSION: 2.2.1
-  FOUNDATION_VERSION: 2.1.0
-  INTERACTIVE_EXPERIENCES_VERSION: 2.0.15
-  WEBVIEW2_VERSION: 1.0.4022.49
+  WINUI_VERSION: 2.3.2
+  FOUNDATION_VERSION: 2.3.5
+  INTERACTIVE_EXPERIENCES_VERSION: 2.1.3
+  WEBVIEW2_VERSION: 1.0.4078.44
 
 jobs:
   build:
@@ -70,7 +70,7 @@ jobs:
         shell: cmd
         env:
           WINDOWSAPP_SDK_DIR: ${{ github.workspace }}\WindowsAppSDK\Microsoft.WindowsAppSDK.WinUI.${{ env.WINUI_VERSION }}
-          ANGLE_COMMIT: chromium/7922
+          ANGLE_COMMIT: chromium/7977
         run: |
           call build.cmd ${{ matrix.arch }}
 
