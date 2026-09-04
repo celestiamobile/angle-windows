@@ -26,6 +26,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Windows SDK v10.0.28000
+        shell: cmd
+        run: |
+          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" modify --installPath "C:\Program Files\Microsoft Visual Studio\18\Enterprise" --quiet --force --norestart --add Microsoft.VisualStudio.Component.Windows11SDK.28000
       - name: Setup MSVC Toolchain
         uses: ilammy/msvc-dev-cmd@v1
         with:
