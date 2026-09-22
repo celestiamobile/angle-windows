@@ -74,7 +74,7 @@ jobs:
         shell: cmd
         env:
           WINDOWSAPP_SDK_DIR: ${{ github.workspace }}\WindowsAppSDK\Microsoft.WindowsAppSDK.WinUI.${{ env.WINUI_VERSION }}
-          ANGLE_COMMIT: chromium/8037
+          ANGLE_COMMIT: chromium/8059
         run: |
           call build.cmd ${{ matrix.arch }}
 
