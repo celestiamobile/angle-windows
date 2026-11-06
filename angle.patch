@@ -2,6 +2,17 @@ diff --git a/BUILD.gn b/BUILD.gn
 index 81d5cb41c1..49a12f5fd3 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
+@@ -311,7 +311,9 @@ config("internal_config") {
+     defines += [ "ANGLE_OUTSIDE_WEBKIT" ]
+   }
+ 
+-  if (is_win && build_with_chromium) {
++  # Keep SimpleMutex consistent between common code and UWP-enabled targets.
++  # ANGLE_ENABLE_WINDOWS_UWP is only defined on the latter.
++  if (is_win && (build_with_chromium || angle_is_winuwp)) {
+     defines += [ "ANGLE_WINDOWS_NO_FUTEX=1" ]
+   }
+ 
 @@ -381,10 +381,7 @@ config("extra_warnings") {
        "-Wconditional-uninitialized",
        "-Wextra-semi-stmt",
