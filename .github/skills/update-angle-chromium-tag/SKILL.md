@@ -101,7 +101,7 @@ Read the patch list + order straight out of the repo's own build script
 (don't assume — order matters and changes over time):
 
 - `angle-apple/build.sh`: `angle.apple.patch` → `variable_rasterization_rate_map.patch` → `angle.visionos.patch` → `angle.metal.patch` → (cd `build/`) → `chromium.build.apple.patch` → `chromium.build.visionos.patch`.
-- `angle-windows/build.cmd` + `build.patch`: single `angle.patch` against ANGLE, `build.patch` against the nested `//build` checkout.
+- `angle-windows/build.cmd`: `angle.patch` -> `angle.d3d11-texture-storage.patch` against ANGLE, then `build.patch` against the nested `//build` checkout. See `docs/d3d11-texture-storage.md` for the runtime patch's safety requirements and regression tests.
 - `angle-android`: no `*.patch` files currently — bump-only.
 
 Apply with plain `git apply --ignore-whitespace --whitespace=nowarn`

@@ -1,0 +1,24 @@
+diff --git a/src/libANGLE/renderer/d3d/TextureD3D.cpp b/src/libANGLE/renderer/d3d/TextureD3D.cpp
+index 8423888..6420194 100644
+--- a/src/libANGLE/renderer/d3d/TextureD3D.cpp
++++ b/src/libANGLE/renderer/d3d/TextureD3D.cpp
+@@ -897,6 +897,19 @@ angle::Result TextureD3D::ensureBindFlags(const gl::Context *context, BindFlags
+             ANGLE_TRY(createCompleteStorage(context, newBindFlags, &newStorage));
+ 
+             ANGLE_TRY(mTexStorage->copyToStorage(context, newStorage.get()));
++
++            // A complete storage copy makes explicit staging backups redundant. Keep the
++            // preservation path when the layouts differ; CopyResource does not report failure.
++            if (mTexStorage->getFormat() == newStorage->getFormat() &&
++                mTexStorage->getTopLevel() == newStorage->getTopLevel() &&
++                mTexStorage->getLevelCount() == newStorage->getLevelCount() &&
++                mTexStorage->getLevelWidth(0) == newStorage->getLevelWidth(0) &&
++                mTexStorage->getLevelHeight(0) == newStorage->getLevelHeight(0) &&
++                mTexStorage->getLevelDepth(0) == newStorage->getLevelDepth(0))
++            {
++                ANGLE_TRY(releaseTexStorage(context, gl::TexLevelMask()));
++            }
++
+             ANGLE_TRY(setCompleteTexStorage(context, newStorage.get()));
+             newStorage.release();
+             // If this texture is used in compute shader, we should invalidate this texture so that

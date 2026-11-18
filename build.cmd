@@ -79,6 +79,7 @@ rem
 pushd angle
 
 call git apply ..\angle.patch --ignore-whitespace --whitespace=nowarn || exit /b 1
+call git apply ..\angle.d3d11-texture-storage.patch --ignore-whitespace --whitespace=nowarn || exit /b 1
 pushd build
 call git apply ..\..\build.patch --ignore-whitespace --whitespace=nowarn || exit /b 1
 popd
